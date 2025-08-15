@@ -1,0 +1,102 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 48 100% 98%; /* Lighter, warmer beige */
+    --foreground: 20 14.3% 4.1%;
+
+    --card: 48 100% 98%;
+    --card-foreground: 20 14.3% 4.1%;
+
+    --popover: 48 100% 98%;
+    --popover-foreground: 20 14.3% 4.1%;
+
+    --primary: 175 82% 31%; /* Seafoam Green */
+    --primary-foreground: 175 82% 98%;
+
+    --secondary: 158 88% 18%; /* Forest Accent */
+    --secondary-foreground: 158 88% 98%;
+    
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 168 100% 39%; /* Accent Color */
+    --accent-foreground: 168 100% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 175 82% 31%;
+
+    --radius: 0.8rem;
+  }
+
+  .dark {
+    --background: 220 20% 7%;
+    --foreground: 220 20% 98%;
+
+    --card: 220 20% 10%;
+    --card-foreground: 220 20% 98%;
+
+    --popover: 220 20% 10%;
+    --popover-foreground: 220 20% 98%;
+
+    --primary: 175 75% 40%;
+    --primary-foreground: 175 75% 98%;
+
+    --secondary: 158 88% 22%;
+    --secondary-foreground: 158 88% 98%;
+    
+    --muted: 220 20% 15%;
+    --muted-foreground: 220 20% 65%;
+
+    --accent: 168 100% 47%;
+    --accent-foreground: 168 100% 98%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 20% 20%;
+    --input: 220 20% 20%;
+    --ring: 175 75% 40%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  
+  .link-underline {
+    position: relative;
+    text-decoration: none;
+    @apply text-foreground;
+  }
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: hsl(var(--primary));
+    transform-origin: bottom right;
+    transition: transform 0.3s ease-out;
+  }
+  .link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+}
+
+    
