@@ -1,25 +1,18 @@
 'use client';
 import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Pill, Sparkles, LoaderCircle } from 'lucide-react';
-import { getPrescriptionInsights } from '@/app/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
-const initialState = {
-  error: null,
-  data: null,
-};
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
+function SubmitButton({ isLoading }: { isLoading: boolean }) {
   return (
-    <Button type="submit" disabled={pending}>
-      {pending ? <LoaderCircle className="animate-spin mr-2" /> : <Sparkles className="mr-2" />}
+    <Button type="submit" disabled={isLoading}>
+      {isLoading ? <LoaderCircle className="animate-spin mr-2" /> : <Sparkles className="mr-2" />}
       Get Insights
     </Button>
   );
@@ -33,7 +26,8 @@ const InsightSection = ({ title, content, badgeVariant }: { title: string; conte
 )
 
 export function PrescriptionInsights() {
-  const [state, formAction] = useFormState(getPrescriptionInsights, initialState);
+  const [insights, setInsights] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
   const dummyPrescription = `Medication: Amoxicillin 500mg capsules.
@@ -41,15 +35,21 @@ Instructions: Take one capsule every 8 hours for 7 days. Finish all medication e
 Doctor: Dr. Emily Carter.
 Pharmacy: Wellness Pharmacy.`;
 
-  useEffect(() => {
-    if (state.error) {
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: state.error,
-        })
-    }
-  }, [state, toast]);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    // Simulate AI processing for demo
+    setTimeout(() => {
+      setInsights({
+        dosage: "Take one 500mg capsule every 8 hours (three times daily) for 7 days",
+        potentialSideEffects: "Common side effects may include nausea, diarrhea, stomach upset, and allergic reactions",
+        interactions: "May interact with blood thinners and birth control pills. Avoid alcohol during treatment",
+        summary: "Amoxicillin is an antibiotic used to treat bacterial infections. Complete the full course even if symptoms improve"
+      });
+      setIsLoading(false);
+    }, 2000);
+  };
 
   return (
     <Card className="col-span-1 md:col-span-1 row-span-1 rounded-2xl border-white/20 bg-white/10 p-0 shadow-lg backdrop-blur-2xl dark:border-white/10 dark:bg-black/10">
@@ -67,18 +67,18 @@ Pharmacy: Wellness Pharmacy.`;
       
       <CardContent className="px-6 pb-6">
         <div className="space-y-4">
-            <form action={formAction} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
             <Textarea
                 name="prescription"
                 placeholder="Paste prescription details here..."
                 className="min-h-[120px] bg-background/50 dark:bg-black/20"
                 defaultValue={dummyPrescription}
             />
-            <SubmitButton />
+            <SubmitButton isLoading={isLoading} />
             </form>
 
             <AnimatePresence>
-            {state.data && (
+            {insights && (
                 <motion.div 
                 className="space-y-4 pt-4"
                 initial="hidden"
@@ -86,10 +86,10 @@ Pharmacy: Wellness Pharmacy.`;
                 transition={{ staggerChildren: 0.1 }}
                 >
                 <h3 className="font-semibold text-foreground">AI Insights:</h3>
-                <InsightSection title="Dosage" content={state.data.dosage} badgeVariant="default" />
-                <InsightSection title="Potential Side Effects" content={state.data.potentialSideEffects} badgeVariant="destructive" />
-                <InsightSection title="Interactions" content={state.data.interactions} badgeVariant="secondary" />
-                <InsightSection title="Summary" content={state.data.summary} badgeVariant="outline" />
+                <InsightSection title="Dosage" content={insights.dosage} badgeVariant="default" />
+                <InsightSection title="Potential Side Effects" content={insights.potentialSideEffects} badgeVariant="destructive" />
+                <InsightSection title="Interactions" content={insights.interactions} badgeVariant="secondary" />
+                <InsightSection title="Summary" content={insights.summary} badgeVariant="outline" />
                 </motion.div>
             )}
             </AnimatePresence>

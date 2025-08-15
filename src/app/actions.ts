@@ -1,4 +1,10 @@
 'use server';
+
+// Disable server actions for static export
+if (process.env.NODE_ENV === 'production') {
+  throw new Error('Server actions are not supported in static export mode');
+}
+
 import { generateHealthSummary } from '@/ai/flows/generate-health-summary';
 import { analyzePrescription } from '@/ai/flows/prescription-insights';
 import { z } from 'zod';

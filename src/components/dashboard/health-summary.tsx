@@ -1,48 +1,37 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, FileText, Volume2, LoaderCircle } from 'lucide-react';
-import { getHealthSummary } from '@/app/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 
-const initialState = {
-  error: null,
-  data: null,
-};
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
+function SubmitButton({ isLoading }: { isLoading: boolean }) {
   return (
-    <Button type="submit" disabled={pending}>
-      {pending ? <LoaderCircle className="animate-spin mr-2" /> : <Sparkles className="mr-2" />}
+    <Button type="submit" disabled={isLoading}>
+      {isLoading ? <LoaderCircle className="animate-spin mr-2" /> : <Sparkles className="mr-2" />}
       Generate Summary
     </Button>
   );
 }
 
 export function HealthSummary() {
-  const [state, formAction] = useFormState(getHealthSummary, initialState);
   const [summaryText, setSummaryText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (state.data?.summary) {
-      setSummaryText(state.data.summary);
-    }
-    if (state.error) {
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: state.error,
-        })
-    }
-  }, [state, toast]);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    // Simulate AI processing for demo
+    setTimeout(() => {
+      setSummaryText("Based on the health records provided, the patient appears to be in good overall health with well-controlled hypertension. Blood pressure readings are within acceptable range with current medication. Cholesterol levels are optimal. The knee pain after exercise may benefit from physical therapy as recommended. Continue current medication regimen and follow up as scheduled.");
+      setIsLoading(false);
+    }, 2000);
+  };
 
   const handleReadAloud = () => {
     if ('speechSynthesis' in window && summaryText) {
@@ -80,14 +69,14 @@ Notes: Patient reports occasional knee pain after exercise. Recommended physical
 
       <CardContent className="px-6 pb-6">
         <div className="space-y-4">
-            <form action={formAction} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
             <Textarea
                 name="records"
                 placeholder="Paste health records here..."
                 className="min-h-[150px] bg-background/50 dark:bg-black/20"
                 defaultValue={dummyRecords}
             />
-            <SubmitButton />
+            <SubmitButton isLoading={isLoading} />
             </form>
 
             <AnimatePresence>
